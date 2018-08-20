@@ -14,6 +14,7 @@ drop table X$SUBESTACION;
 drop table X$SUICHE;
 drop table X$TORRE_TRANSMISION;
 drop table X$TRANSFORMADOR;
+drop table X$BARRAJE;
 drop table X$CONDUCTOR_PRIMARIO;
 drop table X$CONDUCTOR_TRANSMISION;
 drop table X$CONDUCTOR_SECUNDARIO;
