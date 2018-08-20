@@ -1,0 +1,825 @@
+drop table X$AISLADERO;
+drop table X$ARRENDAMIENTO;
+drop table X$CAMARA;
+drop table X$LUMINARIA;
+drop table X$CONECTIVIDAD;
+drop table X$CUCHILLA;
+drop table X$INTERRUPTOR;
+drop table X$NODO_CONDUCTOR;
+drop table X$POSTE;
+drop table X$RECONECTADOR;
+drop table X$REFERENCIA;
+drop table X$SECCIONALIZADOR;
+drop table X$SUBESTACION;
+drop table X$SUICHE;
+drop table X$TORRE_TRANSMISION;
+drop table X$TRANSFORMADOR;
+drop table X$BARRAJE;
+drop table X$CONDUCTOR_PRIMARIO;
+drop table X$CONDUCTOR_TRANSMISION;
+drop table X$CONDUCTOR_SECUNDARIO;
+drop table X$INDICADOR_FALLA;
+drop table X$FEEDERS;
+drop table X$PARARRAYOS;
+drop table X$CAJA_DISTRIBUICION;
+drop table X$TRANSF_POT;
+drop table ETL_EXTRACCION_LOG;
+drop table ETL_TRANSFORMACION_LOG;
+drop table ETL_CARGA_LOG;
+drop table ETL_EXTRACCION_REPORT;
+drop table ETL_TRANSFORMACION_REPORT;
+drop table ETL_CARGA_REPORT;
+drop table ETL_VALIDATION_LOG;
+drop table ETL_CODE2FID;
+drop table ETL_NORMAS;
+drop table ETL_PICKLISTS;
+
+
+create table etl_normas
+(
+g3e_fno number(5),
+tipo varchar(50),
+valor varchar2(15),
+norma varchar2(50),
+cantidad number(5),
+grupo varchar(20)
+);
+
+create table ETL_EXTRACCION_LOG
+(
+tabla varchar2(80),
+tabla_e varchar2(80),
+codigo varchar2(20),
+msg varchar2(300),
+circuito varchar2(50),
+fecha date
+);
+
+create table ETL_EXTRACCION_REPORT
+(
+circuito varchar2(50),
+tabla varchar2(50),
+tiempo_ejecucion number(8),
+registros_ext number(8),
+registros_err number(8),
+fecha date
+);
+
+create table ETL_TRANSFORMACION_LOG
+(
+tabla varchar2(80),
+tabla_e varchar2(80),
+codigo varchar2(20),
+preoredad number(2),
+msg varchar2(300),
+circuito varchar2(50),
+fecha date
+);
+
+
+create table ETL_TRANSFORMACION_REPORT
+(
+circuito varchar2(50),
+elemento varchar2(50),
+tiempo_ejecucion number(8),
+registros_ext number(8),
+registros_err number(8),
+fecha date
+);
+
+
+create table ETL_CARGA_LOG
+(
+jobname      varchar2(50),
+circuito varchar2(50),
+g3e_fid varchar2(80),
+g3e_fno varchar2(80),
+status varchar2(50),
+componente varchar2(50),
+fecha date,
+erro varchar2(200)
+);
+
+create table etl_validation_log
+(
+circuito varchar2(20),
+G3E_FID NUMBER(8),
+G3E_FNO NUMBER(5),
+G3E_CNO NUMBER(5),
+ErrorPriority VARCHAR2(5),
+ErrorDescription VARCHAR2(500),
+ErrorLocation VARCHAR2(200)
+);
+
+
+create table ETL_CARGA_REPORT
+(
+circuito varchar2(50),
+job varchar2(50),
+tiempo_ejecucion number(8),
+registros_ext number(8),
+registros_err number(8),
+fecha date
+);
+
+create table ETL_PICKLISTS
+(
+categoria varchar2(50),
+valor varchar2(80),
+descrip varchar2(80),
+valor_carga varchar2(100)
+);
+
+create table ETL_CODE2FID
+(
+tabla varchar2(80),
+code varchar2(80),
+g3e_fno number(5),
+g3e_fid number(10),
+circuito varchar2(50)
+);
+
+create table X$INDICADOR_FALLA
+(
+  code   VARCHAR2(16),
+  maker  VARCHAR2(16),
+  tipo   VARCHAR2(16),
+  inom   NUMBER(10,2),
+  ifalla NUMBER(10,2),
+  elnode VARCHAR2(16)
+);
+
+create table X$LUMINARIA
+(
+  address       VARCHAR2(50),
+  code          VARCHAR2(16),
+  elnode        VARCHAR2(16),
+  etiqueta      CHAR(15),
+  f_utilizacion NUMBER(5,2),
+  kv            NUMBER(6,3),
+  kw            NUMBER(6,3),
+  latitud       NUMBER(15,8),
+  longitud      NUMBER(15,8),
+  medida        VARCHAR2(2),
+  mun_id        NUMBER(10),
+  observac      VARCHAR2(60),
+  owner         VARCHAR2(30),
+  perdidas      NUMBER(11,3) not null,
+  phases        NUMBER(2),
+  project       VARCHAR2(16),
+  tparent       VARCHAR2(16),
+  type          VARCHAR2(1),
+  user_         VARCHAR2(30),
+  uso           CHAR(15),
+  xpos          NUMBER(9,1),
+  ypos          NUMBER(9,1)
+);
+
+create table X$CONDUCTOR_TRANSMISION
+(
+  address    VARCHAR2(50),
+  code       VARCHAR2(16),
+  conductor  VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  elnode1    VARCHAR2(16),
+  elnode2    VARCHAR2(16),
+  fparent    VARCHAR2(16),
+  guarda     VARCHAR2(16),
+  neutral    VARCHAR2(16),
+  owner      VARCHAR2(30),
+  picture    VARCHAR2(80),
+  poblacion  VARCHAR2(1),
+  project    VARCHAR2(16),
+  towner     VARCHAR2(2),
+  user_      VARCHAR2(50),
+  class      NUMBER(1),
+  kvnom      NUMBER(7,3),
+  lat1       NUMBER(20,10),
+  lat2       NUMBER(20,10),
+  length     NUMBER(8,1),
+  lon1       NUMBER(20,10),
+  lon2       NUMBER(20,10),
+  phases     NUMBER(2),
+  xpos1      NUMBER(9,1),
+  xpos2      NUMBER(9,1),
+  ypos1      NUMBER(9,1),
+  ypos2      NUMBER(9,1),
+  zpos1      NUMBER(10,2),
+  zpos2      NUMBER(10,2),
+  date_rem   DATE,
+  date_      DATE
+);
+
+
+create table X$INTERRUPTOR
+(
+  code       VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  address    VARCHAR2(50),
+  project    VARCHAR2(16),
+  assembly   VARCHAR2(16),
+  user_      VARCHAR2(50),
+  picture    VARCHAR2(80),
+  phases     NUMBER(2),
+  fparent    VARCHAR2(16),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  kv         NUMBER(7,3),
+  amp        NUMBER(6,1),
+  state      NUMBER(1),
+  linesectio VARCHAR2(16),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  maker      VARCHAR2(16),
+  owner      VARCHAR2(30),
+  towner     VARCHAR2(1),
+  municipio  NUMBER(10),
+  zone       NUMBER(10),
+  date_inst  DATE
+);
+
+
+
+
+create table X$CUCHILLA
+(
+  code       VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  address    VARCHAR2(50),
+  project    VARCHAR2(16),
+  assembly   VARCHAR2(16),
+  user_      VARCHAR2(50),
+  picture    VARCHAR2(80),
+  phases     NUMBER(2),
+  fparent    VARCHAR2(16),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  kv         NUMBER(7,3),
+  amp        NUMBER(6,1),
+  state      NUMBER(1),
+  linesectio VARCHAR2(16),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  maker      VARCHAR2(16),
+  owner      VARCHAR2(30),
+  towner     VARCHAR2(1),
+  municipio  NUMBER(10),
+  zone       NUMBER(10),
+  date_inst  DATE
+);
+
+
+
+create table X$SUICHE
+(
+  code       VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  address    VARCHAR2(50),
+  project    VARCHAR2(16),
+  assembly   VARCHAR2(16),
+  user_      VARCHAR2(50),
+  picture    VARCHAR2(80),
+  phases     NUMBER(2),
+  fparent    VARCHAR2(16),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  kv         NUMBER(7,3),
+  amp        NUMBER(6,1),
+  state      NUMBER(1),
+  linesectio VARCHAR2(16),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  maker      VARCHAR2(16),
+  owner      VARCHAR2(30),
+  towner     VARCHAR2(1),
+  municipio  NUMBER(10),
+  zone       NUMBER(10),
+  date_inst  DATE
+);
+
+create table X$RECONECTADOR
+(
+  code       VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  address    VARCHAR2(50),
+  project    VARCHAR2(16),
+  assembly   VARCHAR2(16),
+  user_      VARCHAR2(50),
+  picture    VARCHAR2(80),
+  phases     NUMBER(2),
+  fparent    VARCHAR2(16),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  kv         NUMBER(7,3),
+  amp        NUMBER(6,1),
+  state      NUMBER(1),
+  linesectio VARCHAR2(16),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  maker      VARCHAR2(16),
+  owner      VARCHAR2(30),
+  towner     VARCHAR2(1),
+  municipio  NUMBER(10),
+  zone       NUMBER(10),
+  date_inst  DATE
+);
+
+
+create table X$REFERENCIA
+(
+  code       VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  address    VARCHAR2(50),
+  project    VARCHAR2(16),
+  assembly   VARCHAR2(16),
+  user_      VARCHAR2(50),
+  picture    VARCHAR2(80),
+  phases     NUMBER(2),
+  fparent    VARCHAR2(16),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  kv         NUMBER(7,3),
+  amp        NUMBER(6,1),
+  state      NUMBER(1),
+  linesectio VARCHAR2(16),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  maker      VARCHAR2(16),
+  owner      VARCHAR2(30),
+  towner     VARCHAR2(1),
+  municipio  NUMBER(10),
+  zone       NUMBER(10),
+  date_inst  DATE
+);
+
+create table X$SECCIONALIZADOR
+(
+  code       VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  address    VARCHAR2(50),
+  project    VARCHAR2(16),
+  assembly   VARCHAR2(16),
+  user_      VARCHAR2(50),
+  picture    VARCHAR2(80),
+  phases     NUMBER(2),
+  fparent    VARCHAR2(16),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  kv         NUMBER(7,3),
+  amp        NUMBER(6,1),
+  state      NUMBER(1),
+  linesectio VARCHAR2(16),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  maker      VARCHAR2(16),
+  owner      VARCHAR2(30),
+  towner     VARCHAR2(1),
+  municipio  NUMBER(10),
+  zone       NUMBER(10),
+  date_inst  DATE
+);
+
+
+
+
+create table X$AISLADERO
+(
+  code       VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  address    VARCHAR2(50),
+  project    VARCHAR2(16),
+  assembly   VARCHAR2(16),
+  user_      VARCHAR2(50),
+  picture    VARCHAR2(80),
+  phases     NUMBER(2),
+  fparent    VARCHAR2(16),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  kv         NUMBER(7,3),
+  amp        NUMBER(6,1),
+  state      NUMBER(1),
+  linesectio VARCHAR2(16),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  maker      VARCHAR2(16),
+  owner      VARCHAR2(30),
+  towner     VARCHAR2(1),
+  municipio  NUMBER(10),
+  zone       NUMBER(10),
+  tipofuses  VARCHAR2(10),
+  date_inst  DATE
+);
+
+create table X$CAMARA
+(
+ADDRESS   VARCHAR2(50),
+ASSEMBLY   VARCHAR2(16),
+CODE   VARCHAR2(16),
+DESCRIPTIO   VARCHAR2(50),
+OWNER   VARCHAR2(30),
+PICTURE   VARCHAR2(80),
+POBLACION   VARCHAR2(1),
+PROJECT   VARCHAR2(16),
+TOWNER   VARCHAR2(2),
+USER_   VARCHAR2(50),
+DEP_ID   NUMBER(2),
+LATITUD   NUMBER(15,8),
+LONGITUD   NUMBER(15,8),
+MUN_ID   NUMBER(10),
+XPOS   NUMBER(9,1),
+YPOS   NUMBER(9,1)
+);
+
+
+create table X$TORRE_TRANSMISION
+(
+ADDRESS   VARCHAR2(50),
+ASSEMBLY   VARCHAR2(16),
+CODE   VARCHAR2(16),
+DESCRIPTIO   VARCHAR2(50),
+OWNER   VARCHAR2(30),
+PICTURE   VARCHAR2(80),
+POBLACION   VARCHAR2(1),
+PROJECT   VARCHAR2(16),
+TOWNER   VARCHAR2(2),
+USER_   VARCHAR2(50),
+DEP_ID   NUMBER(2),
+LATITUD   NUMBER(15,8),
+LONGITUD   NUMBER(15,8),
+MUN_ID   NUMBER(10),
+XPOS   NUMBER(9,1),
+YPOS   NUMBER(9,1)
+);
+
+
+create table X$NODO_CONDUCTOR
+(
+ADDRESS   VARCHAR2(50),
+ASSEMBLY   VARCHAR2(16),
+CODE   VARCHAR2(16),
+DESCRIPTIO   VARCHAR2(50),
+OWNER   VARCHAR2(30),
+PICTURE   VARCHAR2(80),
+POBLACION   VARCHAR2(1),
+PROJECT   VARCHAR2(16),
+TOWNER   VARCHAR2(2),
+USER_   VARCHAR2(50),
+DEP_ID   NUMBER(2),
+LATITUD   NUMBER(15,8),
+LONGITUD   NUMBER(15,8),
+MUN_ID   NUMBER(10),
+XPOS   NUMBER(9,1),
+YPOS   NUMBER(9,1)
+);
+
+create table X$SUBESTACION
+(
+ADDRESS   VARCHAR2(50),
+ADMIN   VARCHAR2(50),
+CODE   VARCHAR2(16),
+DESCRIPTIO   VARCHAR2(50),
+OWNER   VARCHAR2(50),
+POBLACION   VARCHAR2(1),
+PROJECT   VARCHAR2(16),
+USER_   VARCHAR2(50),
+AREA   NUMBER(10,2),
+COST   NUMBER(11,0),
+DPTO   NUMBER(4,0),
+LATITUD   NUMBER(15,8),
+LONGITUD   NUMBER(15,8),
+MAIN_KV   NUMBER(7,3),
+MUNICIPIO   NUMBER(4,0),
+MVA_INSTAL   NUMBER(7,1),
+MVAR_PEAK   NUMBER(8,2),
+MW_PEAK   NUMBER(8,2),
+XPOS   NUMBER(9,1),
+YPOS   NUMBER(9,1)
+);
+
+
+
+
+create table X$POSTE
+(
+ADDRESS   VARCHAR2(50),
+ASSEMBLY   VARCHAR2(16),
+CODE   VARCHAR2(16),
+DESCRIPTIO   VARCHAR2(50),
+OWNER   VARCHAR2(30),
+PICTURE   VARCHAR2(80),
+POBLACION   VARCHAR2(1),
+PROJECT   VARCHAR2(16),
+TOWNER   VARCHAR2(2),
+USER_   VARCHAR2(50),
+DEP_ID   NUMBER(2),
+LATITUD   NUMBER(15,8),
+LONGITUD   NUMBER(15,8),
+MUN_ID   NUMBER(10),
+XPOS   NUMBER(9,1),
+YPOS   NUMBER(9,1)
+);
+
+create table X$CONECTIVIDAD
+(
+  kvnom      NUMBER(9,2),
+  ifalla     VARCHAR2(16),
+  emedida    VARCHAR2(16),
+  pt         VARCHAR2(16),
+  prayos     VARCHAR2(16),
+  owner      VARCHAR2(30),
+  towner     VARCHAR2(2),
+  feeder     VARCHAR2(16),
+  phnode     VARCHAR2(16),
+  isconnecte NUMBER(1),
+  spacing    VARCHAR2(16),
+  height     NUMBER(6,1),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  fparent    VARCHAR2(16),
+  tparent    VARCHAR2(16),
+  phases     NUMBER(2),
+  assembly   VARCHAR2(16),
+  code       VARCHAR2(16)
+);
+
+
+create table X$arrendamiento
+(
+  code       VARCHAR2(16),
+  phnode     VARCHAR2(16),
+  height     NUMBER(10,2),
+  company    VARCHAR2(16),
+  type       VARCHAR2(16),
+  cuadrilla  VARCHAR2(30)
+);
+
+
+create table X$TRANSFORMADOR
+(
+  address    VARCHAR2(50),
+  autoprot   CHAR(2),
+  caso       CHAR(20),
+  code       VARCHAR2(16),
+  date_fab   DATE,
+  date_inst  DATE,
+  date_rem   DATE,
+  descriptio VARCHAR2(50),
+  elnode     VARCHAR2(16),
+  fparent    VARCHAR2(16),
+  invnumber  VARCHAR2(15),
+  lvelnode   VARCHAR2(16),
+  marca      VARCHAR2(16),
+  owner      VARCHAR2(30),
+  owner1     VARCHAR2(1),
+  owner2      VARCHAR2(30),
+  phnode     VARCHAR2(16),
+  picture    VARCHAR2(80),
+  poblacion  VARCHAR2(1),
+  serial     VARCHAR2(16),
+  tipofuses  CHAR(5),
+  tipo_red   VARCHAR2(1),
+  tiposub    VARCHAR2(50),
+  trftype    VARCHAR2(16),
+  user_      VARCHAR2(50),
+  valvula    CHAR(1),
+  zone       VARCHAR2(100),
+  culosses   NUMBER(5,2),
+  dep_id     NUMBER(2),
+  felosses   NUMBER(5,2),
+  group_     NUMBER(1),
+  impedance  NUMBER(5,2),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  municipio  NUMBER(3),
+  ncalidad   NUMBER(1),
+  pcv        NUMBER(1),
+  phases     NUMBER(2),
+  tipo_sub   NUMBER(2),
+  project    VARCHAR2(16),
+  num_trfs   NUMBER(1),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1)
+);
+
+
+
+
+create table X$BARRAJE
+(
+  address    VARCHAR2(50),
+  code       VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  picture    VARCHAR2(80),
+  project    VARCHAR2(16),
+  user_      VARCHAR2(50),
+  amp        NUMBER(7,1),
+  kv         NUMBER(7,3),
+  latitud    NUMBER(20,10),
+  longitud   NUMBER(20,10),
+  mva1ph_scc NUMBER(7,1),
+  mva3ph_scc NUMBER(7,1),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  substation VARCHAR2(16),
+  orientatio NUMBER(3)
+);
+
+
+create table X$CONDUCTOR_PRIMARIO
+(
+  address    VARCHAR2(50),
+  code       VARCHAR2(16),
+  conductor  VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  elnode1    VARCHAR2(16),
+  elnode2    VARCHAR2(16),
+  fparent    VARCHAR2(16),
+  guarda     VARCHAR2(16),
+  neutral    VARCHAR2(16),
+  owner      VARCHAR2(30),
+  picture    VARCHAR2(80),
+  poblacion  VARCHAR2(1),
+  project    VARCHAR2(16),
+  towner     VARCHAR2(2),
+  user_      VARCHAR2(50),
+  class      NUMBER(1),
+  kvnom      NUMBER(7,3),
+  lat1       NUMBER(20,10),
+  lat2       NUMBER(20,10),
+  length     NUMBER(8,1),
+  lon1       NUMBER(20,10),
+  lon2       NUMBER(20,10),
+  phases     NUMBER(2),
+  xpos1      NUMBER(9,1),
+  xpos2      NUMBER(9,1),
+  ypos1      NUMBER(9,1),
+  ypos2      NUMBER(9,1),
+  zpos1      NUMBER(10,2),
+  zpos2      NUMBER(10,2),
+  date_rem   DATE,
+  date_      DATE
+);
+
+create table X$TRANSF_POT
+(
+  code      VARCHAR2(16),
+  maker     VARCHAR2(16),
+  press     NUMBER(10,2),
+  relas     VARCHAR2(16),
+  ractual   NUMBER(10,2),
+  burden    NUMBER(10,2),
+  clase     VARCHAR2(16),
+  tipo      VARCHAR2(16),
+  capacidad NUMBER(10,2),
+  efase     NUMBER(10,2),
+  emag      NUMBER(10,2),
+  elnode    VARCHAR2(16),
+  xpos      NUMBER(9,1),
+  ypos      NUMBER(9,1)
+);
+
+create table X$FEEDERS
+(
+  code       VARCHAR2(16),
+  descriptio VARCHAR2(50),
+  address    VARCHAR2(50),
+  isopen     NUMBER(1),
+  assembly   VARCHAR2(16),
+  user_      VARCHAR2(50),
+  picture    VARCHAR2(80),
+  phases     NUMBER(2),
+  metercode  VARCHAR2(16),
+  customers  NUMBER(5),
+  fparent    VARCHAR2(16),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1),
+  z          NUMBER(7,1),
+  amp        NUMBER(6,1),
+  ison       NUMBER(1),
+  sourcebus  VARCHAR2(16),
+  group_     NUMBER(1),
+  owner      NUMBER(1),
+  reclosin   NUMBER(1),
+  type       NUMBER(1),
+  radial     VARCHAR2(1),
+  user_hist  VARCHAR2(150),
+  prstate    NUMBER(3),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  link       NUMBER(1),
+  sei        VARCHAR2(16)
+);
+
+create table X$CONDUCTOR_SECUNDARIO
+(
+  address    VARCHAR2(50),
+  class      NUMBER(1),
+  code       VARCHAR2(16),
+  conductor  VARCHAR2(16),
+  date_      DATE,
+  date_rem   DATE,
+  descriptio VARCHAR2(50),
+  elnode1    VARCHAR2(16),
+  elnode2    VARCHAR2(16),
+  fparent    VARCHAR2(16),
+  kvnom      NUMBER(6,3),
+  length     NUMBER(8,1),
+  neutral    VARCHAR2(16),
+  owner      VARCHAR2(30),
+  phases     NUMBER(2),
+  picture    VARCHAR2(32),
+  poblacion  VARCHAR2(1),
+  project    VARCHAR2(16),
+  towner     VARCHAR2(2),
+  tparent    VARCHAR2(16),
+  user_      VARCHAR2(50),
+  uso        VARCHAR2(2),
+  xpos1      NUMBER(9,1),
+  xpos2      NUMBER(9,1),
+  ypos1      NUMBER(9,1),
+  ypos2      NUMBER(9,1),
+  zpos1      NUMBER(10,2),
+  zpos2      NUMBER(10,2),
+  lat1       NUMBER(20,10),
+  lat2       NUMBER(20,10),
+  lon1       NUMBER(20,10),
+  lon2       NUMBER(20,10)
+);
+
+create table X$PARARRAYOS
+(
+  bil     NUMBER(10,2),
+  code    VARCHAR2(16),
+  clase   VARCHAR2(16),
+  inom    NUMBER(10,2),
+  vcebado NUMBER(10,2),
+  vmax    NUMBER(10,2),
+  vnom    NUMBER(10,2)
+);
+
+
+create table X$CAJA_DISTRIBUICION
+(
+  address    VARCHAR2(50),
+  assembly   VARCHAR2(16),
+  code       VARCHAR2(16),
+  dep_id     NUMBER(2),
+  descriptio VARCHAR2(50),
+  latitud    NUMBER(15,8),
+  longitud   NUMBER(15,8),
+  mun_id     NUMBER(10),
+  owner      VARCHAR2(30),
+  picture    VARCHAR2(50),
+  poblacion  VARCHAR2(1),
+  project    VARCHAR2(16),
+  towner     VARCHAR2(2),
+  user_      VARCHAR2(50),
+  xpos       NUMBER(9,1),
+  ypos       NUMBER(9,1)
+);
+
+drop sequence etl_carga_seq;
+create sequence etl_carga_seq start with 503 increment by 1;
+
+
+
+create or replace public synonym CUSTMETR for AREDES.CUSTMETR;
+create or replace public synonym FEEDERS for AREDES.FEEDERS;
+create or replace public synonym FUSES for AREDES.FUSES;
+create or replace public synonym GENERATR for AREDES.GENERATR;
+create or replace public synonym IFALLA for AREDES.IFALLA;
+create or replace public synonym LVELNODE for AREDES.LVELNODE;
+create or replace public synonym LVLINSEC for AREDES.LVLINSEC;
+create or replace public synonym LVPHNODE for AREDES.LVPHNODE;
+create or replace public synonym MVELNODE for AREDES.MVELNODE;
+create or replace public synonym MVLINSEC for AREDES.MVLINSEC;
+create or replace public synonym MVPHNODE for AREDES.MVPHNODE;
+create or replace public synonym NETOWNERS for AREDES.NETOWNERS;
+create or replace public synonym PRAYOS for AREDES.PRAYOS;
+create or replace public synonym PT for AREDES.PT;
+create or replace public synonym SRCBUSES for AREDES.SRCBUSES;
+create or replace public synonym STREETLG for AREDES.STREETLG;
+create or replace public synonym SUBSTATI for AREDES.SUBSTATI;
+create or replace public synonym SWITCHES for AREDES.SWITCHES;
+create or replace public synonym TRANSFOR for AREDES.TRANSFOR;
+create or replace public synonym CONDUCTO for AREDES.CONDUCTO;
+create or replace public synonym TRFTYPES for AREDES.TRFTYPES;
+
+
+create or replace view etl_chec_resumen as
+select c.fparent,
+       decode(count(ext.circuito), 0, 'NO', 'SI') EXTRACION,
+       decode(count(tra.circuito), 0, 'NO', 'SI') TRANSFORMACION,
+       decode(count(car.circuito), 0, 'NO', 'SI') CARGA
+  from mvelnode c
+  full join etl_extraccion_report ext
+    on ext.circuito = c.fparent
+  full join etl_transformacion_report tra
+    on tra.circuito = c.fparent
+  full join etl_carga_report car
+    on car.circuito = c.fparent
+ group by c.fparent
+ order by c.fparent;
+/
+
+
