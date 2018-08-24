@@ -805,12 +805,24 @@ create or replace public synonym TRANSFOR for AREDES.TRANSFOR;
 create or replace public synonym CONDUCTO for AREDES.CONDUCTO;
 create or replace public synonym TRFTYPES for AREDES.TRFTYPES;
 
+create index AREDES.idx_mvpho_code on aredes.MVPHNODE(CODE);
+create index AREDES.idx_lvpho_code on aredes.LVPHNODE(CODE);
+create index AREDES.idx_lvel_code on aredes.LVELNODE(CODE);
+create index AREDES.idx_lvel_phnode on aredes.LVELNODE(PHNODE);
+create index AREDES.idx_mvel_code on aredes.MVELNODE(CODE);
+create index AREDES.idx_mvel_phnode on aredes.MVELNODE(PHNODE);
+create index idx_etl_c2f_a on etl_code2fid(code, g3e_fno);
+create index idx_x$conn_fp on x$conectividad (phnode,fparent);
+create index idx_chec_nodo_code on CHEC_NODOS_ELEC(code)
+;
+
 
 create or replace view etl_chec_resumen as
 select c.fparent,
        decode(count(ext.circuito), 0, 'NO', 'SI') EXTRACION,
        decode(count(tra.circuito), 0, 'NO', 'SI') TRANSFORMACION,
-       decode(count(car.circuito), 0, 'NO', 'SI') CARGA
+       decode(count(car.circuito), 0, 'NO', 'SI') CARGA,
+       decode(count(val.circuito), 0, 'NO', 'SI') VALIDACION
   from mvelnode c
   full join etl_extraccion_report ext
     on ext.circuito = c.fparent
@@ -818,6 +830,8 @@ select c.fparent,
     on tra.circuito = c.fparent
   full join etl_carga_report car
     on car.circuito = c.fparent
+  full join (select distinct circuito from etl_validation_log) val
+    on val.circuito = c.fparent
  group by c.fparent
  order by c.fparent;
 /

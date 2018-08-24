@@ -3726,7 +3726,7 @@ create or replace package body ETL_EXTRACCION_CHEC is
           (vTablaOrigem,
            vTablaDestino,
            vTRANSFOR.CODE,
-           'Elemento con AUTOPROT inv·lido',
+           'Elemento con AUTOPROT inv√°lido',
            vCircuito,
            sysdate);
         continue;
@@ -4282,6 +4282,7 @@ create or replace package body ETL_EXTRACCION_CHEC is
   
     pe_conductor_primario(cargarTodo, pCircuito);
     pe_conductor_transmision(cargarTodo, pCircuito);
+    pe_conductor_secundario(cargarTodo, pCircuito);
   
     /*
     insert into etl_extraccion_log

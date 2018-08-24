@@ -20,7 +20,8 @@ create or replace package ETL_CARGA_CHEC is
                         pTiempo       in timestamp);
 
   procedure ControlTriggers(pDisable in number);
-
+  procedure ControlIndexes(pDisable in number);
+  procedure CrearIndexesFIDFNO;
 end ETL_CARGA_CHEC;
 /
 create or replace package body ETL_CARGA_CHEC is
@@ -358,6 +359,70 @@ create or replace package body ETL_CARGA_CHEC is
                           replace(tabla.table_name, 'T$', 'B$') ||
                           ' enable all triggers';
       end if;
+    
+    end loop;
+  
+  end;
+
+  procedure ControlIndexes(pDisable in number) is
+  
+  begin
+  
+    if pDisable = 1 then
+      delete from etl_indexes;
+      commit;
+    
+      for tabla in (select distinct table_name
+                      from all_all_tables
+                     where owner = 'GENERGIA'
+                       and table_name like 'T$%') loop
+      
+        for idx in (select index_name, table_name
+                      from all_indexes
+                     where table_name =
+                           replace(tabla.table_name, 'T$', 'B$')) loop
+        
+          insert into etl_indexes
+          values
+            (idx.index_name,
+             idx.table_name,
+             to_char(dbms_metadata.get_ddl('INDEX', idx.index_name)));
+          commit;
+        
+          execute immediate 'drop index ' || idx.index_name;
+        
+        end loop;
+      
+      end loop;
+    else
+      for idx in (select * from etl_indexes) loop
+        begin
+          execute immediate idx.index_ddl;
+        exception
+          when others then
+            dbms_output.put_line('Error on creating index: ' ||
+                                 idx.index_name);
+        end;
+      end loop;
+    end if;
+  
+  end;
+
+  procedure CrearIndexesFIDFNO is
+  
+  begin
+  
+    for c in (select 'create index IDX_' || table_name || 'FID_FNO ON ' ||
+                     table_name || '(G3E_FID, G3E_FNO)' as cmd
+                from etl_indexes
+               group by table_name) loop
+    
+      begin
+        execute immediate c.cmd;
+      exception
+        when others then
+          null;
+      end;
     
     end loop;
   

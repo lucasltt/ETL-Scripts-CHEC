@@ -182,6 +182,8 @@ create or replace package ETL_TRANSFORMACION_CHEC is
                         pRegistros in number,
                         pTiempo    in timestamp);
 
+  procedure PoblarNodosEletricos;
+
 end ETL_TRANSFORMACION_CHEC;
 /
 create or replace package body ETL_TRANSFORMACION_CHEC is
@@ -451,7 +453,7 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
          'T$CCOMUN',
          code,
          2,
-         'No se encontró un departamento',
+         'No se encontrÃ³ un departamento',
          circuito,
          sysdate);
       commit;
@@ -479,7 +481,7 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
          'T$CCOMUN',
          code,
          2,
-         'No se encontró un municipio',
+         'No se encontrÃ³ un municipio',
          circuito,
          sysdate);
       commit;
@@ -510,7 +512,7 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
          'T$CCOMUN',
          code,
          3,
-         'No se encontró una subregion',
+         'No se encontrÃ³ una subregion',
          circuito,
          sysdate);
       commit;
@@ -541,7 +543,7 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
          'T$CCOMUN',
          code,
          3,
-         'No se encontró una Clase Mercado',
+         'No se encontrÃ³ una Clase Mercado',
          circuito,
          sysdate);
       commit;
@@ -569,7 +571,7 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
          'T$CCOMUN',
          code,
          3,
-         'No se encontró una Vereda',
+         'No se encontrÃ³ una Vereda',
          circuito,
          sysdate);
       commit;
@@ -1055,13 +1057,7 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
         continue;
       end if;
     
-      select count(1)
-        into vCount
-        from etl_code2fid
-       where code = c.code
-         and g3e_fno = fno;
-    
-      if vCount > 0 then
+      begin
         select g3e_fid
           into fid
           from etl_code2fid
@@ -1074,7 +1070,10 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
       
         commit;
         continue;
-      end if;
+      exception
+        when others then
+          null;
+      end;
     
       geom := ConvertPoint2Sigma(c.xpos, c.ypos);
     
@@ -1516,13 +1515,7 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
         continue;
       end if;
     
-      select count(1)
-        into vCount
-        from etl_code2fid
-       where code = c.code
-         and g3e_fno = fno;
-    
-      if vCount > 0 then
+      begin
         select g3e_fid
           into fid
           from etl_code2fid
@@ -1535,7 +1528,10 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
       
         commit;
         continue;
-      end if;
+      exception
+        when others then
+          null;
+      end;
     
       geom := ConvertPoint2Sigma(c.xpos, c.ypos);
     
@@ -3460,9 +3456,9 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
       
         case c.ASSEMBLY
           when '3SC' then
-            vESECCION_AT.TIPO := 'Seccionador operación con carga y cuchillas';
+            vESECCION_AT.TIPO := 'Seccionador operaciÃ³n con carga y cuchillas';
           when '3OC' then
-            vESECCION_AT.TIPO := 'Seccionador trifasico de operación con carga';
+            vESECCION_AT.TIPO := 'Seccionador trifasico de operaciÃ³n con carga';
           else
             rollback;
             insert into etl_transformacion_log
@@ -4329,10 +4325,16 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
     
       if vCONN.NODO1_ID = 0 then
         vCONN.NODO1_ID := g3e_node_seq.nextval;
+        update CHEC_NODOS_ELEC
+           set nivel = 'MVELNODE', nodo_mde = vCONN.NODO1_ID
+         where code = c.elnode1;
       end if;
     
       if vCONN.NODO2_ID = 0 then
         vCONN.NODO2_ID := g3e_node_seq.nextval;
+        update CHEC_NODOS_ELEC
+           set nivel = 'MVELNODE', nodo_mde = vCONN.NODO2_ID
+         where code = c.elnode2;
       end if;
     
       vCONN.G3E_FNO := fno;
@@ -4649,10 +4651,16 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
     
       if vCONN.NODO1_ID = 0 then
         vCONN.NODO1_ID := g3e_node_seq.nextval;
+        update CHEC_NODOS_ELEC
+           set nivel = 'LVELNODE', nodo_mde = vCONN.NODO1_ID
+         where code = c.elnode1;
       end if;
     
       if vCONN.NODO2_ID = 0 then
         vCONN.NODO2_ID := g3e_node_seq.nextval;
+        update CHEC_NODOS_ELEC
+           set nivel = 'LVELNODE', nodo_mde = vCONN.NODO2_ID
+         where code = c.elnode2;
       end if;
     
       vCONN.G3E_FNO := fno;
@@ -4942,10 +4950,16 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
     
       if vCONN.NODO1_ID = 0 then
         vCONN.NODO1_ID := g3e_node_seq.nextval;
+        update CHEC_NODOS_ELEC
+           set nivel = 'MVELNODE', nodo_mde = vCONN.NODO1_ID
+         where code = c.elnode1;
       end if;
     
       if vCONN.NODO2_ID = 0 then
         vCONN.NODO2_ID := g3e_node_seq.nextval;
+        update CHEC_NODOS_ELEC
+           set nivel = 'MVELNODE', nodo_mde = vCONN.NODO2_ID
+         where code = c.elnode2;
       end if;
     
       vCONN.G3E_FNO := fno;
@@ -6800,8 +6814,9 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
       execute immediate 'drop index idx_t$conn_fid';
     exception
       when others then
-        dbms_output.put_line('Could not drop el index');
+        null;
     end;
+  
     etl_transformacion_chec.pt_conductor_transmision(pCircuito);
     etl_transformacion_chec.pt_conductor_primario(pCircuito);
     etl_transformacion_chec.pt_conductor_secundario(pCircuito);
@@ -7050,7 +7065,8 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
         select g3e_fid
           into vFID
           from etl_code2fid
-         where code = conductor.code;
+         where code = conductor.code
+           and g3e_fno in (19000, 18900);
       
         if conductor.pos = 1 then
           select nodo1_id
@@ -7100,7 +7116,8 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
         select g3e_fid
           into vFID
           from etl_code2fid
-         where code = conductor.code;
+         where code = conductor.code
+           and g3e_fno = 21200;
       
         if conductor.pos = 1 then
           select nodo1_id
@@ -7383,6 +7400,17 @@ create or replace package body ETL_TRANSFORMACION_CHEC is
       (pCircuito, pTabla, vTiempo, pRegistros, vReg, sysdate);
     commit;
   
+  end;
+
+  procedure PoblarNodosEletricos is
+  
+  begin
+    insert into CHEC_NODOS_ELEC
+      select null, conn.code, conn.phnode, conn.fparent, 0
+        from x$conectividad conn
+       where not exists
+       (select code from CHEC_NODOS_ELEC where code = conn.code);
+    commit;
   end;
 
 end ETL_TRANSFORMACION_CHEC;

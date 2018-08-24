@@ -33,7 +33,14 @@ drop table ETL_VALIDATION_LOG;
 drop table ETL_CODE2FID;
 drop table ETL_NORMAS;
 drop table ETL_PICKLISTS;
+drop table ETL_INDEXES;
 
+create table etl_indexes 
+(
+index_name varchar2(100),
+table_name varchar2(100),
+index_ddl varchar2(3000)
+);
 
 create table etl_normas
 (
@@ -805,6 +812,15 @@ create or replace public synonym TRANSFOR for AREDES.TRANSFOR;
 create or replace public synonym CONDUCTO for AREDES.CONDUCTO;
 create or replace public synonym TRFTYPES for AREDES.TRFTYPES;
 
+create index AREDES.idx_mvpho_code on aredes.MVPHNODE(CODE);
+create index AREDES.idx_lvpho_code on aredes.LVPHNODE(CODE);
+create index AREDES.idx_lvel_code on aredes.LVELNODE(CODE);
+create index AREDES.idx_lvel_phnode on aredes.LVELNODE(PHNODE);
+create index AREDES.idx_mvel_code on aredes.MVELNODE(CODE);
+create index AREDES.idx_mvel_phnode on aredes.MVELNODE(PHNODE);
+create index idx_etl_c2f_a on etl_code2fid(code, g3e_fno);
+create index idx_x$conn_fp on x$conectividad (phnode,fparent);
+create index idx_chec_nodo_code on CHEC_NODOS_ELEC(code);
 
 create or replace view etl_chec_resumen as
 select c.fparent,
