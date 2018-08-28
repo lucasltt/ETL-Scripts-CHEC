@@ -1,39 +1,72 @@
-drop table X$AISLADERO;
-drop table X$ARRENDAMIENTO;
-drop table X$CAMARA;
-drop table X$LUMINARIA;
-drop table X$CONECTIVIDAD;
-drop table X$CUCHILLA;
-drop table X$INTERRUPTOR;
-drop table X$NODO_CONDUCTOR;
-drop table X$POSTE;
-drop table X$RECONECTADOR;
-drop table X$REFERENCIA;
-drop table X$SECCIONALIZADOR;
-drop table X$SUBESTACION;
-drop table X$SUICHE;
-drop table X$TORRE_TRANSMISION;
-drop table X$TRANSFORMADOR;
-drop table X$BARRAJE;
-drop table X$CONDUCTOR_PRIMARIO;
-drop table X$CONDUCTOR_TRANSMISION;
-drop table X$CONDUCTOR_SECUNDARIO;
-drop table X$INDICADOR_FALLA;
-drop table X$FEEDERS;
-drop table X$PARARRAYOS;
-drop table X$CAJA_DISTRIBUICION;
-drop table X$TRANSF_POT;
-drop table ETL_EXTRACCION_LOG;
-drop table ETL_TRANSFORMACION_LOG;
-drop table ETL_CARGA_LOG;
-drop table ETL_EXTRACCION_REPORT;
-drop table ETL_TRANSFORMACION_REPORT;
-drop table ETL_CARGA_REPORT;
-drop table ETL_VALIDATION_LOG;
-drop table ETL_CODE2FID;
-drop table ETL_NORMAS;
-drop table ETL_PICKLISTS;
-drop table ETL_INDEXES;
+
+--***************************************************************************************
+--*   Version       : 1.0
+--*   Req.          : 
+--*   OC.           : 
+--*   Analista      : Luis Alexander
+--*   Desarrollador : Lucas Turchet
+--*   Fecha         : 01 Marzo de 2017
+--*   Descripcion   : Crear proceso ETL CHEC
+--***************************************************************************************
+
+
+--***************************************************************************************
+--BORRAR TABLAS VIEJAS
+--***************************************************************************************
+declare
+  type tableArrays is table of varchar2(60);
+  tables tableArrays := tableArrays('X$AISLADERO',
+                                    'X$ARRENDAMIENTO',
+                                    'X$BARRAJE',
+                                    'X$CAJA_DISTRIBUICION',
+                                    'X$CAMARA',
+                                    'X$CONDUCTOR_PRIMARIO',
+                                    'X$CONDUCTOR_SECUNDARIO',
+                                    'X$CONDUCTOR_TRANSMISION',
+                                    'X$CONECTIVIDAD',
+                                    'X$CUCHILLA',
+                                    'X$FEEDERS',
+                                    'X$INDICADOR_FALLA',
+                                    'X$INTERRUPTOR',
+                                    'X$LUMINARIA',
+                                    'X$NODO_CONDUCTOR',
+                                    'X$PARARRAYOS',
+                                    'X$POSTE',
+                                    'X$RECONECTADOR',
+                                    'X$REFERENCIA',
+                                    'X$SECCIONALIZADOR',
+                                    'X$SUBESTACION',
+                                    'X$SUICHE',
+                                    'X$TORRE_TRANSMISION',
+                                    'X$TRANSFORMADOR',
+                                    'X$TRANSF_POT',
+                                    'ETL_CARGA_LOG',
+                                    'ETL_CARGA_REPORT',
+                                    'ETL_CODE2FID',
+                                    'ETL_EXTRACCION_LOG',
+                                    'ETL_EXTRACCION_REPORT',
+                                    'ETL_INDEXES',
+                                    'ETL_NORMAS',
+                                    'ETL_PICKLISTS',
+                                    'ETL_TRANSFORMACION_LOG',
+                                    'ETL_TRANSFORMACION_REPORT',
+                                    'ETL_VALIDATION_LOG');
+begin
+  for i in 1 .. tables.count loop
+    begin
+      execute immediate 'drop table ' || tables(i);
+    exception
+      when others then
+        null;
+    end;
+  
+  end loop;
+end;
+/
+
+--***************************************************************************************
+--CREAR TABLAS NUEVAS
+--***************************************************************************************
 
 create table etl_indexes 
 (
@@ -477,7 +510,7 @@ LONGITUD   NUMBER(15,8),
 MUN_ID   NUMBER(10),
 XPOS   NUMBER(9,1),
 YPOS   NUMBER(9,1)
-);
+).
 
 create table X$SUBESTACION
 (
@@ -785,10 +818,84 @@ create table X$CAJA_DISTRIBUICION
   ypos       NUMBER(9,1)
 );
 
-drop sequence etl_carga_seq;
-create sequence etl_carga_seq start with 503 increment by 1;
+
+--***************************************************************************************
+--Actualizar secuencias
+--***************************************************************************************
+begin
+  execute immediate 'drop sequence etl_carga_seq';
+exception
+  when others then
+    null;
+end;
+/
+
+create sequence etl_carga_seq start with 100 increment by 1;
 
 
+--***************************************************************************************
+--CREAR INDICES PARA OPTIMIZAR EL PROCESO DE TRANSFORMACIONS
+--***************************************************************************************
+
+declare
+  type tableArrays is table of varchar2(60);
+  tables tableArrays := tableArrays('AREDES.idx_mvpho_code',
+                                    'AREDES.idx_lvpho_code',
+                                    'AREDES.idx_lvel_code',
+                                    'AREDES.idx_lvel_phnode',
+                                    'AREDES.idx_mvel_code',
+                                    'AREDES.idx_mvel_phnode',
+                                    'idx_etl_c2f_a',
+                                    'idx_x$conn_fp',
+                                    'idx_chec_nodo_code');
+begin
+  for i in 1 .. tables.count loop
+    begin
+      execute immediate 'drop index ' || tables(i);
+    exception
+      when others then
+        null;
+    end;
+  
+  end loop;
+end;
+/
+
+create index AREDES.idx_mvpho_code on aredes.MVPHNODE(CODE);
+create index AREDES.idx_lvpho_code on aredes.LVPHNODE(CODE);
+create index AREDES.idx_lvel_code on aredes.LVELNODE(CODE);
+create index AREDES.idx_lvel_phnode on aredes.LVELNODE(PHNODE);
+create index AREDES.idx_mvel_code on aredes.MVELNODE(CODE);
+create index AREDES.idx_mvel_phnode on aredes.MVELNODE(PHNODE);
+create index idx_etl_c2f_a on etl_code2fid(code, g3e_fno);
+create index idx_x$conn_fp on x$conectividad (phnode,fparent);
+create index idx_chec_nodo_code on CHEC_NODOS_ELEC(code);
+--***************************************************************************************
+--CREAR VISTA DE CONTROL
+--***************************************************************************************
+
+create or replace view etl_chec_resumen as
+select c.fparent,
+       decode(count(ext.circuito), 0, 'NO', 'SI') EXTRACION,
+       decode(count(tra.circuito), 0, 'NO', 'SI') TRANSFORMACION,
+       decode(count(car.circuito), 0, 'NO', 'SI') CARGA,
+       decode(count(val.circuito), 0, 'NO', 'SI') VALIDACION
+  from mvelnode c
+  full join etl_extraccion_report ext
+    on ext.circuito = c.fparent
+  full join etl_transformacion_report tra
+    on tra.circuito = c.fparent
+  full join etl_carga_report car
+    on car.circuito = c.fparent
+  full join (select distinct circuito from etl_validation_log) val
+    on val.circuito = c.fparent
+ group by c.fparent
+ order by c.fparent;
+/
+
+--***************************************************************************************
+--CREAR SINONIMOS PUBLICOS
+--***************************************************************************************
 
 create or replace public synonym CUSTMETR for AREDES.CUSTMETR;
 create or replace public synonym FEEDERS for AREDES.FEEDERS;
@@ -812,33 +919,80 @@ create or replace public synonym TRANSFOR for AREDES.TRANSFOR;
 create or replace public synonym CONDUCTO for AREDES.CONDUCTO;
 create or replace public synonym TRFTYPES for AREDES.TRFTYPES;
 
-create index AREDES.idx_mvpho_code on aredes.MVPHNODE(CODE);
-create index AREDES.idx_lvpho_code on aredes.LVPHNODE(CODE);
-create index AREDES.idx_lvel_code on aredes.LVELNODE(CODE);
-create index AREDES.idx_lvel_phnode on aredes.LVELNODE(PHNODE);
-create index AREDES.idx_mvel_code on aredes.MVELNODE(CODE);
-create index AREDES.idx_mvel_phnode on aredes.MVELNODE(PHNODE);
-create index idx_etl_c2f_a on etl_code2fid(code, g3e_fno);
-create index idx_x$conn_fp on x$conectividad (phnode,fparent);
-create index idx_chec_nodo_code on CHEC_NODOS_ELEC(code);
 
-create or replace view etl_chec_resumen as
-select c.fparent,
-       decode(count(ext.circuito), 0, 'NO', 'SI') EXTRACION,
-       decode(count(tra.circuito), 0, 'NO', 'SI') TRANSFORMACION,
-       decode(count(car.circuito), 0, 'NO', 'SI') CARGA,
-       decode(count(val.circuito), 0, 'NO', 'SI') VALIDACION
-  from mvelnode c
-  full join etl_extraccion_report ext
-    on ext.circuito = c.fparent
-  full join etl_transformacion_report tra
-    on tra.circuito = c.fparent
-  full join etl_carga_report car
-    on car.circuito = c.fparent
-  full join (select distinct circuito from etl_validation_log) val
-    on val.circuito = c.fparent
- group by c.fparent
- order by c.fparent;
-/
-
-
+create or replace public synonym X$AISLADERO for GENERGIA.X$AISLADERO;
+create or replace public synonym X$ARRENDAMIENTO for GENERGIA.X$ARRENDAMIENTO;
+create or replace public synonym X$BARRAJE for GENERGIA.X$BARRAJE;
+create or replace public synonym X$CAJA_DISTRIBUICION for GENERGIA.X$CAJA_DISTRIBUICION;
+create or replace public synonym X$CAMARA for GENERGIA.X$CAMARA;
+create or replace public synonym X$CONDUCTOR_PRIMARIO for GENERGIA.X$CONDUCTOR_PRIMARIO;
+create or replace public synonym X$CONDUCTOR_SECUNDARIO for GENERGIA.X$CONDUCTOR_SECUNDARIO;
+create or replace public synonym X$CONDUCTOR_TRANSMISION for GENERGIA.X$CONDUCTOR_TRANSMISION;
+create or replace public synonym X$CONECTIVIDAD for GENERGIA.X$CONECTIVIDAD;
+create or replace public synonym X$CUCHILLA for GENERGIA.X$CUCHILLA;
+create or replace public synonym X$FEEDERS for GENERGIA.X$FEEDERS;
+create or replace public synonym X$INDICADOR_FALLA for GENERGIA.X$INDICADOR_FALLA;
+create or replace public synonym X$INTERRUPTOR for GENERGIA.X$INTERRUPTOR;
+create or replace public synonym X$LUMINARIA for GENERGIA.X$LUMINARIA;
+create or replace public synonym X$PARARRAYOS for GENERGIA.X$PARARRAYOS;
+create or replace public synonym X$POSTE for GENERGIA.X$POSTE;
+create or replace public synonym X$RECONECTADOR for GENERGIA.X$RECONECTADOR;
+create or replace public synonym X$REFERENCIA for GENERGIA.X$REFERENCIA;
+create or replace public synonym X$SECCIONALIZADOR for GENERGIA.X$SECCIONALIZADOR;
+create or replace public synonym X$SUBESTACION for GENERGIA.X$SUBESTACION;
+create or replace public synonym X$SUICHE for GENERGIA.X$SUICHE;
+create or replace public synonym X$TORRE_TRANSMISION for GENERGIA.X$TORRE_TRANSMISION;
+create or replace public synonym X$TRANSFORMADOR for GENERGIA.X$TRANSFORMADOR;
+create or replace public synonym X$TRANSFORMADOR_BKP for GENERGIA.X$TRANSFORMADOR_BKP;
+create or replace public synonym X$TRANSF_POT for GENERGIA.X$TRANSF_POT;
+create or replace public synonym ETL_CARGA_LOG for GENERGIA.ETL_CARGA_LOG;
+create or replace public synonym ETL_CARGA_REPORT for GENERGIA.ETL_CARGA_REPORT;
+create or replace public synonym ETL_CODE2FID for GENERGIA.ETL_CODE2FID;
+create or replace public synonym ETL_EXTRACCION_LOG for GENERGIA.ETL_EXTRACCION_LOG;
+create or replace public synonym ETL_EXTRACCION_REPORT for GENERGIA.ETL_EXTRACCION_REPORT;
+create or replace public synonym ETL_INDEXES for GENERGIA.ETL_INDEXES;
+create or replace public synonym ETL_NORMAS for GENERGIA.ETL_NORMAS;
+create or replace public synonym ETL_PICKLISTS for GENERGIA.ETL_PICKLISTS;
+create or replace public synonym ETL_TRANSFORMACION_LOG for GENERGIA.ETL_TRANSFORMACION_LOG;
+create or replace public synonym ETL_TRANSFORMACION_REPORT for GENERGIA.ETL_TRANSFORMACION_REPORT;
+create or replace public synonym ETL_VALIDATION_LOG for GENERGIA.ETL_VALIDATION_LOG;
+create or replace public synonym etl_chec_resumen for GENERGIA.etl_chec_resumen;
+--***************************************************************************************
+--CREAR PERMISOS
+--***************************************************************************************
+grant select, update, delete on ETL_CARGA_LOG to GDESIGNER;
+grant select, update, delete on ETL_CARGA_REPORT to GDESIGNER;
+grant select, update, delete on ETL_CODE2FID to GDESIGNER;
+grant select, update, delete on ETL_EXTRACCION_LOG to GDESIGNER;
+grant select, update, delete on ETL_EXTRACCION_REPORT to GDESIGNER;
+grant select, update, delete on ETL_INDEXES to GDESIGNER;
+grant select, update, delete on ETL_NORMAS to GDESIGNER;
+grant select, update, delete on ETL_PICKLISTS to GDESIGNER;
+grant select, update, delete on ETL_TRANSFORMACION_LOG to GDESIGNER;
+grant select, update, delete on ETL_TRANSFORMACION_REPORT to GDESIGNER;
+grant select, update, delete on ETL_VALIDATION_LOG to GDESIGNER;
+grant select, update, delete on X$AISLADERO to GDESIGNER;
+grant select, update, delete on X$ARRENDAMIENTO to GDESIGNER;
+grant select, update, delete on X$BARRAJE to GDESIGNER;
+grant select, update, delete on X$CAJA_DISTRIBUICION to GDESIGNER;
+grant select, update, delete on X$CAMARA to GDESIGNER;
+grant select, update, delete on X$CONDUCTOR_PRIMARIO to GDESIGNER;
+grant select, update, delete on X$CONDUCTOR_SECUNDARIO to GDESIGNER;
+grant select, update, delete on X$CONDUCTOR_TRANSMISION to GDESIGNER;
+grant select, update, delete on X$CONECTIVIDAD to GDESIGNER;
+grant select, update, delete on X$CUCHILLA to GDESIGNER;
+grant select, update, delete on X$FEEDERS to GDESIGNER;
+grant select, update, delete on X$INDICADOR_FALLA to GDESIGNER;
+grant select, update, delete on X$INTERRUPTOR to GDESIGNER;
+grant select, update, delete on X$LUMINARIA to GDESIGNER;
+grant select, update, delete on X$PARARRAYOS to GDESIGNER;
+grant select, update, delete on X$POSTE to GDESIGNER;
+grant select, update, delete on X$RECONECTADOR to GDESIGNER;
+grant select, update, delete on X$REFERENCIA to GDESIGNER;
+grant select, update, delete on X$SECCIONALIZADOR to GDESIGNER;
+grant select, update, delete on X$SUBESTACION to GDESIGNER;
+grant select, update, delete on X$SUICHE to GDESIGNER;
+grant select, update, delete on X$TORRE_TRANSMISION to GDESIGNER;
+grant select, update, delete on X$TRANSFORMADOR to GDESIGNER;
+grant select, update, delete on X$TRANSFORMADOR_BKP to GDESIGNER;
+grant select, update, delete on X$TRANSF_POT to GDESIGNER;
