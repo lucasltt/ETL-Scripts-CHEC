@@ -5,7 +5,7 @@
 --*   OC.           : 
 --*   Analista      : Luis Alexander
 --*   Desarrollador : Lucas Turchet
---*   Fecha         : 01 Marzo de 2017
+--*   Fecha         : 28 Agosto de 2018
 --*   Descripcion   : Crear proceso ETL CHEC
 --***************************************************************************************
 
@@ -960,42 +960,42 @@ create or replace public synonym etl_chec_resumen for GENERGIA.etl_chec_resumen;
 --***************************************************************************************
 --CREAR PERMISOS
 --***************************************************************************************
-grant select, update, delete on ETL_CARGA_LOG to GDESIGNER;
-grant select, update, delete on ETL_CARGA_REPORT to GDESIGNER;
-grant select, update, delete on ETL_CODE2FID to GDESIGNER;
-grant select, update, delete on ETL_EXTRACCION_LOG to GDESIGNER;
-grant select, update, delete on ETL_EXTRACCION_REPORT to GDESIGNER;
-grant select, update, delete on ETL_INDEXES to GDESIGNER;
-grant select, update, delete on ETL_NORMAS to GDESIGNER;
-grant select, update, delete on ETL_PICKLISTS to GDESIGNER;
-grant select, update, delete on ETL_TRANSFORMACION_LOG to GDESIGNER;
-grant select, update, delete on ETL_TRANSFORMACION_REPORT to GDESIGNER;
-grant select, update, delete on ETL_VALIDATION_LOG to GDESIGNER;
-grant select, update, delete on X$AISLADERO to GDESIGNER;
-grant select, update, delete on X$ARRENDAMIENTO to GDESIGNER;
-grant select, update, delete on X$BARRAJE to GDESIGNER;
-grant select, update, delete on X$CAJA_DISTRIBUICION to GDESIGNER;
-grant select, update, delete on X$CAMARA to GDESIGNER;
-grant select, update, delete on X$CONDUCTOR_PRIMARIO to GDESIGNER;
-grant select, update, delete on X$CONDUCTOR_SECUNDARIO to GDESIGNER;
-grant select, update, delete on X$CONDUCTOR_TRANSMISION to GDESIGNER;
-grant select, update, delete on X$CONECTIVIDAD to GDESIGNER;
-grant select, update, delete on X$CUCHILLA to GDESIGNER;
-grant select, update, delete on X$FEEDERS to GDESIGNER;
-grant select, update, delete on X$INDICADOR_FALLA to GDESIGNER;
-grant select, update, delete on X$INTERRUPTOR to GDESIGNER;
-grant select, update, delete on X$LUMINARIA to GDESIGNER;
-grant select, update, delete on X$PARARRAYOS to GDESIGNER;
-grant select, update, delete on X$POSTE to GDESIGNER;
-grant select, update, delete on X$RECONECTADOR to GDESIGNER;
-grant select, update, delete on X$REFERENCIA to GDESIGNER;
-grant select, update, delete on X$SECCIONALIZADOR to GDESIGNER;
-grant select, update, delete on X$SUBESTACION to GDESIGNER;
-grant select, update, delete on X$SUICHE to GDESIGNER;
-grant select, update, delete on X$TORRE_TRANSMISION to GDESIGNER;
-grant select, update, delete on X$TRANSFORMADOR to GDESIGNER;
-grant select, update, delete on X$TRANSFORMADOR_BKP to GDESIGNER;
-grant select, update, delete on X$TRANSF_POT to GDESIGNER;
+grant select, update, delete on ETL_CARGA_LOG to DESIGNER;
+grant select, update, delete on ETL_CARGA_REPORT to DESIGNER;
+grant select, update, delete on ETL_CODE2FID to DESIGNER;
+grant select, update, delete on ETL_EXTRACCION_LOG to DESIGNER;
+grant select, update, delete on ETL_EXTRACCION_REPORT to DESIGNER;
+grant select, update, delete on ETL_INDEXES to DESIGNER;
+grant select, update, delete on ETL_NORMAS to DESIGNER;
+grant select, update, delete on ETL_PICKLISTS to DESIGNER;
+grant select, update, delete on ETL_TRANSFORMACION_LOG to DESIGNER;
+grant select, update, delete on ETL_TRANSFORMACION_REPORT to DESIGNER;
+grant select, update, delete on ETL_VALIDATION_LOG to DESIGNER;
+grant select, update, delete on X$AISLADERO to DESIGNER;
+grant select, update, delete on X$ARRENDAMIENTO to DESIGNER;
+grant select, update, delete on X$BARRAJE to DESIGNER;
+grant select, update, delete on X$CAJA_DISTRIBUICION to DESIGNER;
+grant select, update, delete on X$CAMARA to DESIGNER;
+grant select, update, delete on X$CONDUCTOR_PRIMARIO to DESIGNER;
+grant select, update, delete on X$CONDUCTOR_SECUNDARIO to DESIGNER;
+grant select, update, delete on X$CONDUCTOR_TRANSMISION to DESIGNER;
+grant select, update, delete on X$CONECTIVIDAD to DESIGNER;
+grant select, update, delete on X$CUCHILLA to DESIGNER;
+grant select, update, delete on X$FEEDERS to DESIGNER;
+grant select, update, delete on X$INDICADOR_FALLA to DESIGNER;
+grant select, update, delete on X$INTERRUPTOR to DESIGNER;
+grant select, update, delete on X$LUMINARIA to DESIGNER;
+grant select, update, delete on X$PARARRAYOS to DESIGNER;
+grant select, update, delete on X$POSTE to DESIGNER;
+grant select, update, delete on X$RECONECTADOR to DESIGNER;
+grant select, update, delete on X$REFERENCIA to DESIGNER;
+grant select, update, delete on X$SECCIONALIZADOR to DESIGNER;
+grant select, update, delete on X$SUBESTACION to DESIGNER;
+grant select, update, delete on X$SUICHE to DESIGNER;
+grant select, update, delete on X$TORRE_TRANSMISION to DESIGNER;
+grant select, update, delete on X$TRANSFORMADOR to DESIGNER;
+grant select, update, delete on X$TRANSFORMADOR_BKP to DESIGNER;
+grant select, update, delete on X$TRANSF_POT to DESIGNER;
 
 
 --***************************************************************************************
@@ -1053,7 +1053,7 @@ begin
                         c.g3e_table || ' for GENERGIA.T$' || c.g3e_table;
     
       execute immediate 'grant select, update, delete on T$' || c.g3e_table ||
-                        ' to GDESIGNER';
+                        ' to DESIGNER';
     
     exception
       when others then
