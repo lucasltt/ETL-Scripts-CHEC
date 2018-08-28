@@ -215,6 +215,8 @@ create table X$LUMINARIA
   ypos          NUMBER(9,1)
 );
 
+
+
 create table X$CONDUCTOR_TRANSMISION
 (
   address    VARCHAR2(50),
@@ -472,6 +474,26 @@ YPOS   NUMBER(9,1)
 
 
 create table X$TORRE_TRANSMISION
+(
+ADDRESS   VARCHAR2(50),
+ASSEMBLY   VARCHAR2(16),
+CODE   VARCHAR2(16),
+DESCRIPTIO   VARCHAR2(50),
+OWNER   VARCHAR2(30),
+PICTURE   VARCHAR2(80),
+POBLACION   VARCHAR2(1),
+PROJECT   VARCHAR2(16),
+TOWNER   VARCHAR2(2),
+USER_   VARCHAR2(50),
+DEP_ID   NUMBER(2),
+LATITUD   NUMBER(15,8),
+LONGITUD   NUMBER(15,8),
+MUN_ID   NUMBER(10),
+XPOS   NUMBER(9,1),
+YPOS   NUMBER(9,1)
+);
+
+create table X$NODO_CONDUCTOR
 (
 ADDRESS   VARCHAR2(50),
 ASSEMBLY   VARCHAR2(16),
@@ -942,6 +964,7 @@ create or replace public synonym X$SECCIONALIZADOR for GENERGIA.X$SECCIONALIZADO
 create or replace public synonym X$SUBESTACION for GENERGIA.X$SUBESTACION;
 create or replace public synonym X$SUICHE for GENERGIA.X$SUICHE;
 create or replace public synonym X$TORRE_TRANSMISION for GENERGIA.X$TORRE_TRANSMISION;
+create or replace public synonym X$NODO_CONDUCTOR for GENERGIA.X$NODO_CONDUCTOR;
 create or replace public synonym X$TRANSFORMADOR for GENERGIA.X$TRANSFORMADOR;
 create or replace public synonym X$TRANSFORMADOR_BKP for GENERGIA.X$TRANSFORMADOR_BKP;
 create or replace public synonym X$TRANSF_POT for GENERGIA.X$TRANSF_POT;
@@ -994,9 +1017,8 @@ grant select, update, delete on X$SUBESTACION to DESIGNER;
 grant select, update, delete on X$SUICHE to DESIGNER;
 grant select, update, delete on X$TORRE_TRANSMISION to DESIGNER;
 grant select, update, delete on X$TRANSFORMADOR to DESIGNER;
-grant select, update, delete on X$TRANSFORMADOR_BKP to DESIGNER;
 grant select, update, delete on X$TRANSF_POT to DESIGNER;
-
+grant select, update, delete on X$NODO_CONDCUTOR to DESIGNER;
 
 --***************************************************************************************
 --ETL_CREARTABLASINTERMEDIAS
